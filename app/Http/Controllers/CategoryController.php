@@ -2,50 +2,51 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
+use App\Services\CategoryService;
 use Illuminate\Http\Request;
-use App\Models\Category;
+use App\Models\Category; 
 
 class CategoryController extends Controller
 {
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255'
-        ]);
+    protected $categoryService;
 
-        $category = Category::create($validated);
-        return response()->json($category, 201);
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Category::all());
+        $perPage = $request->get('per_page', 10);
+        return $this->categoryService->getAllCategories($perPage);
     }
 
-    public function show(Category $category)
+    public function store(StoreCategoryRequest $request)
     {
-        return response()->json($category);
+        return $this->categoryService->createCategory($request->validated());
     }
 
-    public function update(Request $request, Category $category)
+    public function show(Category $category) 
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255'
-        ]);
-
-        $category->update($validated);
-        return response()->json($category);
+        return $this->categoryService->getCategoryWithPosts($category);
     }
 
-    public function destroy(Category $category)
+    public function update(UpdateCategoryRequest $request, Category $category) 
     {
-        $category->delete();
+        return $this->categoryService->updateCategory($category, $request->validated());
+    }
+
+    public function destroy(Category $category) 
+    {
+        $this->categoryService->deleteCategory($category);
         return response()->json(null, 204);
     }
 
-    public function categoriesWithPosts()
+    public function categoriesWithPosts(Request $request)
     {
-        $categories = Category::with('posts')->get();
-        return response()->json($categories);
+        $perPage = $request->get('per_page', 10);
+        return $this->categoryService->getCategoriesWithPosts($perPage);
     }
 }

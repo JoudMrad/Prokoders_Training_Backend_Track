@@ -2,52 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
+use App\Services\PostService;
 use Illuminate\Http\Request;
-use App\Models\Post;
+use App\Models\Post; 
+use App\Models\Category;
+use App\Models\Author; 
 
 class PostController extends Controller
 {
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'published_at' => 'nullable|date',
-            'category_id' => 'required|exists:categories,id',
-            'author_id' => 'required|exists:authors,id'
-        ]);
+    protected $postService;
 
-        $post = Post::create($validated);
-        return response()->json($post, 201);
-    }   
-    
-    public function index()
+    public function __construct(PostService $postService)
     {
-        return response()->json(Post::all());
+        $this->postService = $postService;
     }
 
-    public function show(Post $post)
+    public function index(Request $request)
     {
-        return response()->json($post);
+        $perPage = $request->get('per_page', 10);
+        return $this->postService->getAllPosts($perPage);
     }
 
-    public function update(Request $request, Post $post)
+    public function store(StorePostRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'published_at' => 'nullable|date',
-            'category_id' => 'required|exists:categories,id',
-            'author_id' => 'required|exists:authors,id'
-        ]);
-
-        $post->update($validated);
-        return response()->json($post);
+        return $this->postService->createPost($request->validated());
     }
 
-    public function destroy(Post $post)
+    public function show(Post $post) 
     {
-        $post->delete();
+        return $this->postService->getPost($post);
+    }
+
+    public function update(UpdatePostRequest $request, Post $post)
+    {
+        return $this->postService->updatePost($post, $request->validated());
+    }
+
+    public function destroy(Post $post) 
+    {
+        $this->postService->deletePost($post);
         return response()->json(null, 204);
+    }
+
+    public function postsByCategory(Request $request, Category $category)
+    {
+        $perPage = $request->get('per_page', 10);
+        return $this->postService->getPostsByCategory($category->id, $perPage);
+    }
+
+    public function postsByAuthor(Request $request, Author $author)
+    {
+        $perPage = $request->get('per_page', 10);
+        return $this->postService->getPostsByAuthor($author->id, $perPage);
     }
 }

@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class post extends Model
+class Post extends Model
 {
     protected $fillable = [
         'title',
@@ -16,16 +17,21 @@ class post extends Model
 
     public function category()
     {
-        return $this -> belongsTo(category::class);
+        return $this -> belongsTo(Category::class);
     }
 
     public function author()
     {
-        return $this -> belongsTo(author::class);
+        return $this -> belongsTo(Author::class);
     }
 
     public function comments()
     {
-        return $this -> hasMany(comment::class);
+        return $this -> hasMany(Comment::class);
+    }
+    
+    public function topics(): BelongsToMany
+    {
+        return $this->belongsToMany(Topic::class, 'post_topic');
     }
 }

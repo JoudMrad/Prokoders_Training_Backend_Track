@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class author extends Model
+class Author extends Model
 {
     protected $fillable = [
         'name',
@@ -13,6 +13,6 @@ class author extends Model
 
     public function posts()
     {
-        return $this -> hasMany(post::class);
+        return $this -> hasMany(Post::class);
     }
 }
