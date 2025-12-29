@@ -6,9 +6,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Services\PostService;
 use Illuminate\Http\Request;
-use App\Models\Post; 
-use App\Models\Category;
-use App\Models\Author; 
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -46,15 +44,15 @@ class PostController extends Controller
         return response()->json(null, 204);
     }
 
-    public function postsByCategory(Request $request, Category $category)
+    public function postsByCategory(Request $request, $categoryId)
     {
         $perPage = $request->get('per_page', 10);
-        return $this->postService->getPostsByCategory($category->id, $perPage);
+        return $this->postService->getPostsByCategory((int)$categoryId, $perPage);
     }
 
-    public function postsByAuthor(Request $request, Author $author)
+    public function postsByAuthor(Request $request, $authorId)
     {
         $perPage = $request->get('per_page', 10);
-        return $this->postService->getPostsByAuthor($author->id, $perPage);
+        return $this->postService->getPostsByAuthor((int)$authorId, $perPage);
     }
 }
