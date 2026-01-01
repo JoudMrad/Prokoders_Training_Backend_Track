@@ -10,7 +10,7 @@ use App\Http\Resources\UserCollection;
 
 class AuthService
 {
-    
+
     public function register(array $data): array
     {
         $user = User::create([
@@ -27,7 +27,7 @@ class AuthService
             'token_type' => 'Bearer',
         ];
     }
-    
+
     public function login(array $data): array
     {
         $user = User::where('email', $data['email'])->first();
@@ -51,18 +51,24 @@ class AuthService
     {
         $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
     }
-    
+
     public function getCurrentUser(User $user): UserResource
     {
         return new UserResource($user);
     }
-    
+
     public function updateProfile(User $user, array $data): UserResource
     {
         $user->update($data);
         return new UserResource($user->fresh());
     }
-    
+
+    public function isAdmin(User $user): bool
+    {
+        return (bool) $user->is_admin;
+    }
+
+
     public function changePassword(User $user, array $data): void
     {
         if (!Hash::check($data['current_password'], $user->password)) {
@@ -75,13 +81,13 @@ class AuthService
             'password' => Hash::make($data['password'])
         ]);
     }
-    
+
     public function getAllUsers(int $perPage = 15): UserCollection
     {
         $users = User::paginate($perPage);
         return new UserCollection($users);
     }
-    
+
     public function logoutFromAllDevices(User $user): void
     {
         $user->tokens()->delete();

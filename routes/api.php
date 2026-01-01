@@ -59,6 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/topics/{topic}/attach-post', [TopicController::class, 'attachPost']);
     Route::post('/topics/{topic}/detach-post', [TopicController::class, 'detachPost']);
 
-    Route::get('/users', [AuthController::class, 'index']); // GET /api/users
-    Route::get('/users/{id}', [AuthController::class, 'show']); // GET /api/users/{id}
+    Route::get('/users', [AuthController::class, 'index']);
+    Route::get('/users/{user}', [AuthController::class, 'show']); 
+    Route::get('/me/is-admin', [AuthController::class, 'isAdmin']);
+
 });

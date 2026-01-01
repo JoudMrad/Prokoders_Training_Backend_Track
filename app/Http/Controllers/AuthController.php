@@ -74,9 +74,17 @@ class AuthController extends Controller
             return response()->json(['message' => 'غير مصرح بالدخول'], 403);
         }
 
-        return new \App\Http\Resources\UserResource($user); 
+        return new \App\Http\Resources\UserResource($user);
     }
-    
+
+    public function isAdmin(Request $request)
+    {
+        return response()->json([
+            'is_admin' => $this->authService->isAdmin($request->user())
+        ]);
+    }
+
+
     public function logoutFromAllDevices(Request $request)
     {
         $this->authService->logoutFromAllDevices($request->user());
